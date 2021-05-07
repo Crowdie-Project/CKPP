@@ -1,0 +1,5 @@
+files:
+  - source: /localization/
+    translation: /localization/%two_letters_code%/%original_file_name%
+    first_line_contains_header: 1
+    scheme: 'context,identifier,source_phrase,translation'
