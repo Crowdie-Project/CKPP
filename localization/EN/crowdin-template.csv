@@ -1,4 +1,4 @@
-"String ID","Source text","Translation","Context","Max.length","Labels"
-"1","String for translation 1","Chaîne pour la traduction 1","Context for string 1","40","mobile_app"
-"2","String for translation 2","Chaîne pour la traduction 2","Context for string 2","40","website"
-"3","String for translation 3","Chaîne pour la traduction 3","Context for string 3","40","emails"
+Code,Description,Definition,Translation
+1100,n/a,[Reserved],[Reserved]
+1101,n/a,Greeting,Getting
+1200,n/a,Generic Infrastructure Problem,Generic Infrastructure Problem
