@@ -5,8 +5,9 @@
   "main": "src/index.js",
   "repository": "https://github.com/Crowdie-Project/CKPP",
   "author": "The Crowdie Team",
-  "license": "CC",
+  "license": "CC0-1.0",
   "dependencies": {
+    "esm": "^3.2.25",
     "papaparse": "^5.3.0"
   }
 }
