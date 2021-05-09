@@ -1,6 +1,6 @@
 {
   "name": "CKPP",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Common Knowledge Propagation Protocol",
   "main": "src/index.js",
   "repository": "https://github.com/Crowdie-Project/CKPP",
