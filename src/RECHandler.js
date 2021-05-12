@@ -68,14 +68,9 @@ export default class RECHandler {
 
     var codearray = Array.from(Object.values(this.Codes), (i) => i);
     var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i).no);
-	for (var i = 0; i < catmatches.length; i++) {
-		this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
-	}
-
-    //console.log(this.listAllCategories());
-    //console.log(this.CategoryMembers);
-    //console.log(this.getCode(1301));
-    console.log(this.isEnd(1300));
+  	for (var i = 0; i < catmatches.length; i++) {
+  		this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
+  	}
   }
 
   /**
@@ -113,8 +108,29 @@ export default class RECHandler {
   }
 
   /**
-  *TODO: FILTERING
+  *General Purpose Function for listing codes
+  *
+  *Takes an options object
+  *
+  *options.category denotes category
+  *
+  *options.eventtype denotes whether "startsOnly", "endsOnly" or both will be returned
   */
+  static listCodes(options){
+    var target;
+
+    if (options.category)
+      target = this.listAllInCategory(options.category);
+    else 
+      target = this.Codes;
+
+    if (options.eventtype == "startsOnly")
+      return target.filter(code=>this.isStart(code.no));
+    else if (options.eventtype == "endsOnly")
+      return target.filter(code=>this.isEnd(code.no));
+    else
+      return target;
+  }
 
   /**
   *Return section of code
