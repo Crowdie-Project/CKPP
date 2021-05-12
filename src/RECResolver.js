@@ -5,9 +5,9 @@ import Papa from 'papaparse';
 const fs = require('fs').promises;
 
 //Local
-import CKPP_Code from './CKPP_Code';
+import RECCode from './RECCode';
 
-export default class CKPP_Resolver {
+export default class RECHandler {
  
   //options
   static locale = "EN";
@@ -22,7 +22,7 @@ export default class CKPP_Resolver {
   static CategoryMembers = {};
 
   /**
-  *Init CKPP_Resolver
+  *Init RECHandler
   */
   static async init() {
   	//TODO: ADD LOCALE SELECTION
@@ -45,7 +45,7 @@ export default class CKPP_Resolver {
     this.Codes=Object.fromEntries(
     	Object.entries(this.CodesCSV)
     	.map(([ key, val ]) => [ val.ID, 
-    		new CKPP_Code(
+    		new RECCode(
     			Number(val.ID),this.getCategory(val.ID),val.Translation
     			)
     		]));
@@ -131,11 +131,22 @@ export default class CKPP_Resolver {
   }
 
   /**
-  *Return start of finish or finish of start
+  *Return whether code is start code
   */
   static isStart(code){
   	return code < 10000;
   }
+
+  /**
+  *Return whether code is end code
+  */
+  static isEnd(code){
+  	return code >= 10000;
+  }
+
+  /**
+  *TODO: FILTERING
+  */
 
   /**
   *Call to reinit with different options
@@ -146,4 +157,4 @@ export default class CKPP_Resolver {
 
 }
 
-CKPP_Resolver.init();
+RECHandler.init();

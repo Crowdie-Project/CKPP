@@ -1,7 +1,7 @@
 {
-  "name": "CKPP",
+  "name": "RECHandler",
   "version": "0.1.0",
-  "description": "Common Knowledge Propagation Protocol",
+  "description": "Reported Event Code Handler",
   "main": "src/index.js",
   "repository": "https://github.com/Crowdie-Project/CKPP",
   "author": "The Crowdie Team",
