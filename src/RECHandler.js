@@ -26,7 +26,8 @@ export default class RECHandler {
   /**
   *Init RECHandler
   */
-  static async init() {
+  //static async init() {
+  static async constructor() {
   	//TODO: ADD LOCALE SELECTION
     this.locale="EN";
     this.SectionsCSV = await (this.loadCSV('./localization/EN/code-tables/sections.csv'));
@@ -116,7 +117,7 @@ export default class RECHandler {
   *
   *options.eventtype denotes whether "startsOnly", "endsOnly" or both will be returned
   */
-  static listCodes(options){
+  static listCodes(options={}){
     var target;
 
     if (options.category)
@@ -182,5 +183,3 @@ export default class RECHandler {
   }
 
 }
-
-RECHandler.init();
