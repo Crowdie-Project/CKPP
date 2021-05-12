@@ -7,6 +7,7 @@ const fs = require('fs').promises;
 //Local
 import RECCode from './RECCode';
 import RECCategory from './RECCategory';
+import RECSection from './RECSection';
 
 export default class RECHandler {
  
@@ -35,7 +36,11 @@ export default class RECHandler {
     //init Sections
     this.Sections=Object.fromEntries(
     	Object.entries(this.SectionsCSV)
-    	.map(([ key, val ]) => [ val.Head, val.Translation ]));
+    	.map(([ key, val ]) => [ val.Head,
+        new RECSection(
+          Number(val.Head),val.Translation
+          )
+        ]));
 
     //init Categories
     this.Categories=Object.fromEntries(
@@ -66,7 +71,7 @@ export default class RECHandler {
 		this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
 	}
 
-    //console.log(this.Categories);
+    //console.log(this.Sections);
     //console.log(this.CategoryMembers);
     //console.log(this.getAllInCat(1300));
   }
