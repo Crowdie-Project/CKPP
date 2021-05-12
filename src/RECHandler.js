@@ -61,30 +61,30 @@ export default class RECHandler {
     		]));
 
     //init Category Members
+    //used to speed up queries
     this.CategoryMembers=Object.fromEntries(
     	Object.entries(this.CategoriesCSV)
     	.map(([ key, val ]) => [ val.Head, [] ]));
 
-    var codearray = Array.from(Object.keys(this.Codes), (i) => i);
-    var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i));
+    var codearray = Array.from(Object.values(this.Codes), (i) => i);
+    var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i).no);
 	for (var i = 0; i < catmatches.length; i++) {
 		this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
 	}
 
-    //console.log(this.Sections);
+    //console.log(this.listAllCategories());
     //console.log(this.CategoryMembers);
-    //console.log(this.getAllInCat(1300));
+    //console.log(this.getCode(1301));
+    console.log(this.isEnd(1300));
   }
 
   /**
   *Read from csv
   */
   static async loadCSV(filename){
-
   	const CSVconfig = {header: true};
-
-	let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
-	.then(csv => Papa.parse(csv,CSVconfig));
+	  let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
+	  .then(csv => Papa.parse(csv,CSVconfig));
     if (error) console.log("error", error);
     else{
       return CSV;
@@ -94,29 +94,40 @@ export default class RECHandler {
   /**
   *Return list of sections
   */
-  static listSections(){
-  	return Array.from(Object.keys(this.Sections));
+  static listAllSections(){
+  	return Array.from(Object.values(this.Sections));
   }
 
   /**
   *Return list of categories
   */
-  static listCategories(){
-  	return Array.from(Object.keys(this.Categories));
+  static listAllCategories(){
+  	return Array.from(Object.values(this.Categories));
   }
+
+  /**
+  *List all codes from a category
+  */
+  static listAllInCategory(code){
+    return this.CategoryMembers[code] || null;
+  }
+
+  /**
+  *TODO: FILTERING
+  */
 
   /**
   *Return section of code
   */
   static getSection(code){
-  	return Math.floor((code%10000)/1000)*1000;
+  	return this.Sections[String(Math.floor((code%10000)/1000)*1000)];
   }
 
   /**
   *Return category of code
   */
   static getCategory(code){
-  	return Math.floor((code%10000)/100)*100;
+    return this.Categories[String(Math.floor((code%10000)/100)*100)];
   }
 
   /**
@@ -130,14 +141,7 @@ export default class RECHandler {
   *Return name of code
   */
   static getName(code){
-  	return this.Codes[code].code || null;
-  }
-
-  /**
-  *List all codes from a category
-  */
-  static getAllInCat(code){
-  	return this.CategoryMembers[code] || null;
+  	return this.Codes[code].no || null;
   }
 
   /**
@@ -151,12 +155,8 @@ export default class RECHandler {
   *Return whether code is end code
   */
   static isEnd(code){
-  	return code >= 10000;
+  	return !this.isStart(code);
   }
-
-  /**
-  *TODO: FILTERING
-  */
 
   /**
   *Call to reinit with different options

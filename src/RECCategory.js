@@ -2,7 +2,7 @@
 
 export default class RECCategory {
 	constructor(category,definition){
-		this.category=category;
+		this.no=category;
 		this.definition=definition;
 	}
 }
