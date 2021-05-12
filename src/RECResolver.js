@@ -27,9 +27,9 @@ export default class RECHandler {
   static async init() {
   	//TODO: ADD LOCALE SELECTION
     this.locale="EN";
-    this.SectionsCSV = await (this.loadCSV('./localization/EN/sections.csv'));
-    this.CategoriesCSV = await (this.loadCSV('./localization/EN/categories.csv'));
-    this.CodesCSV = await (this.loadCSV('./localization/EN/code-table.csv'));
+    this.SectionsCSV = await (this.loadCSV('./localization/EN/code-tables/sections.csv'));
+    this.CategoriesCSV = await (this.loadCSV('./localization/EN/code-tables/categories.csv'));
+    this.CodesCSV = await (this.loadCSV('./localization/EN/code-tables/code-table.csv'));
 
     //init Sections
     this.Sections=Object.fromEntries(
