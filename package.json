@@ -1,5 +1,5 @@
 {
-  "name": "RECHandler",
+  "name": "REC-Handler",
   "version": "0.1.0",
   "description": "Reported Event Code Handler",
   "main": "src/index.js",
