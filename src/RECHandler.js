@@ -10,34 +10,44 @@ import RECCategory from './RECCategory';
 import RECSection from './RECSection';
 
 export default class RECHandler {
- 
-  //options
-  static locale = "EN";
-
-  //storage
-  static SectionsCSV = {};
-  static CategoriesCSV = {};
-  static CodesCSV = {};
-  static Categories = {};
-  static Codes = {};
-
-  static CategoryMembers = {};
 
   /**
   *Init RECHandler
   */
-  //static async init() {
-  static async constructor() {
-  	//TODO: ADD LOCALE SELECTION
+
+  constructor() {
+    //options
+    this.locale = "UK";
+
+    //storage
+    this.SectionsCSV = {};
+    this.CategoriesCSV = {};
+    this.CodesCSV = {};
+    this.Categories = {};
+    this.Codes = {};
+
+    this.CategoryMembers = {};
+  }
+
+  /**
+  *Load!
+  */
+  async load(){
+    //TODO: ADD SUPPORT FOR LOCALE CUSTOMIZATOIN
     this.locale="EN";
-    this.SectionsCSV = await (this.loadCSV('./localization/EN/code-tables/sections.csv'));
-    this.CategoriesCSV = await (this.loadCSV('./localization/EN/code-tables/categories.csv'));
-    this.CodesCSV = await (this.loadCSV('./localization/EN/code-tables/code-table.csv'));
+
+    let a = await this.loadCSV('./localization/EN/code-tables/sections.csv');
+    let b = await this.loadCSV('./localization/EN/code-tables/categories.csv');
+    let c = await this.loadCSV('./localization/EN/code-tables/code-table.csv');
+
+    this.SectionsCSV = a;
+    this.CategoriesCSV = b;
+    this.CodesCSV = c;
 
     //init Sections
     this.Sections=Object.fromEntries(
-    	Object.entries(this.SectionsCSV)
-    	.map(([ key, val ]) => [ val.Head,
+      Object.entries(this.SectionsCSV)
+      .map(([ key, val ]) => [ val.Head,
         new RECSection(
           Number(val.Head),val.Translation
           )
@@ -45,8 +55,8 @@ export default class RECHandler {
 
     //init Categories
     this.Categories=Object.fromEntries(
-    	Object.entries(this.CategoriesCSV)
-    	.map(([ key, val ]) => [ val.Head,
+      Object.entries(this.CategoriesCSV)
+      .map(([ key, val ]) => [ val.Head,
         new RECCategory(
           Number(val.Head),val.Translation
           )
@@ -54,33 +64,34 @@ export default class RECHandler {
 
     //init Codes
     this.Codes=Object.fromEntries(
-    	Object.entries(this.CodesCSV)
-    	.map(([ key, val ]) => [ val.ID, 
-    		new RECCode(
-    			Number(val.ID),this.getCategory(val.ID),val.Translation
-    			)
-    		]));
+      Object.entries(this.CodesCSV)
+      .map(([ key, val ]) => [ val.ID, 
+        new RECCode(
+          Number(val.ID),this.getCategory(val.ID),val.Translation
+          )
+        ]));
 
     //init Category Members
     //used to speed up queries
     this.CategoryMembers=Object.fromEntries(
-    	Object.entries(this.CategoriesCSV)
-    	.map(([ key, val ]) => [ val.Head, [] ]));
+      Object.entries(this.CategoriesCSV)
+      .map(([ key, val ]) => [ val.Head, [] ]));
 
     var codearray = Array.from(Object.values(this.Codes), (i) => i);
     var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i).no);
-  	for (var i = 0; i < catmatches.length; i++) {
-  		this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
-  	}
+    for (var i = 0; i < catmatches.length; i++) {
+      this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
+    }
+
   }
 
   /**
   *Read from csv
   */
-  static async loadCSV(filename){
-  	const CSVconfig = {header: true};
-	  let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
-	  .then(csv => Papa.parse(csv,CSVconfig));
+  async loadCSV(filename){
+    const CSVconfig = {header: true};
+    let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
+    .then(csv => Papa.parse(csv,CSVconfig));
     if (error) console.log("error", error);
     else{
       return CSV;
@@ -90,26 +101,26 @@ export default class RECHandler {
   /**
   *Return list of sections
   */
-  static listAllSections(){
+  listAllSections(){
   	return Array.from(Object.values(this.Sections));
   }
 
   /**
   *Return list of categories
   */
-  static listAllCategories(){
+  listAllCategories(){
   	return Array.from(Object.values(this.Categories));
   }
 
   /**
   *List all codes from a category
   */
-  static listAllInCategory(code){
+  listAllInCategory(code){
     return this.CategoryMembers[code] || null;
   }
 
   /**
-  *General Purpose Function for listing codes
+  *General Purpose for listing codes
   *
   *Takes an options object
   *
@@ -117,7 +128,7 @@ export default class RECHandler {
   *
   *options.eventtype denotes whether "startsOnly", "endsOnly" or both will be returned
   */
-  static listCodes(options={}){
+  listCodes(options={}){
     var target;
 
     if (options.category)
@@ -136,50 +147,43 @@ export default class RECHandler {
   /**
   *Return section of code
   */
-  static getSection(code){
+  getSection(code){
   	return this.Sections[String(Math.floor((code%10000)/1000)*1000)];
   }
 
   /**
   *Return category of code
   */
-  static getCategory(code){
+  getCategory(code){
     return this.Categories[String(Math.floor((code%10000)/100)*100)];
   }
 
   /**
   *Return code info
   */
-  static getCode(code){
+  getCode(code){
   	return this.Codes[code] || null;
   }
 
   /**
   *Return name of code
   */
-  static getName(code){
+  getName(code){
   	return this.Codes[code].no || null;
   }
 
   /**
   *Return whether code is start code
   */
-  static isStart(code){
+  isStart(code){
   	return code < 10000;
   }
 
   /**
   *Return whether code is end code
   */
-  static isEnd(code){
+  isEnd(code){
   	return !this.isStart(code);
-  }
-
-  /**
-  *Call to reinit with different options
-  */
-  static async reinit(){
-  	this.init();
   }
 
 }
