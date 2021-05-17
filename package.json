@@ -1,6 +1,6 @@
 {
   "name": "rec-handler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reported Event Code Handler",
   "main": "src/index.js",
   "repository": "https://github.com/Crowdie-Project/REC-Handler",
