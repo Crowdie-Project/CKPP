@@ -83,12 +83,19 @@ export default class RECHandler {
     try {
       //TODO: FIX PATHS so they can be better tested?
 
-    this.SectionsCSV = this.loadCSV_webpack('../localization/EN/code-tables/sections.csv');
-    this.CategoriesCSV = this.loadCSV_webpack('../localization/EN/code-tables/categories.csv');
-    this.CodesCSV = this.loadCSV_webpack('../localization/EN/code-tables/code-table.csv');
+    //this.SectionsCSV = this.loadCSV_webpack('../localization/EN/code-tables/sections.csv');
+    //this.CategoriesCSV = this.loadCSV_webpack('../localization/EN/code-tables/categories.csv');
+    //this.CodesCSV = this.loadCSV_webpack('../localization/EN/code-tables/code-table.csv');
+
+    //TODO: FIX FIX FIX 
+    //ADDING OPTIONS MANUALLY BECAUSE WE COULD NOT FIGURE OUT THE PROBLEM HERE
+    this.SectionsCSV = require('!!csv-loader?header=true&dynamicTyping=true!../localization/EN/code-tables/sections.csv');
+    this.CategoriesCSV = require('!!csv-loader?header=true&dynamicTyping=true!../localization/EN/code-tables/categories.csv');
+    this.CodesCSV = require('!!csv-loader?header=true&dynamicTyping=true!../localization/EN/code-tables/code-table.csv');
 
       this.initProps(() => void 0);
     } catch (e) {
+    console.error("OH NO");
     console.error(e);
     }
 
@@ -108,11 +115,7 @@ export default class RECHandler {
 
     //TODO FIX THIS?
 
-    const CSVconfig = {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true
-    };
+    const CSVconfig = {header: true};
     let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
     .then(csv => Papa.parse(csv,CSVconfig));
     if (error) console.log("error", error);
@@ -155,15 +158,17 @@ export default class RECHandler {
   *Read from csv using the `csv-loader` webpack loader
   */
   loadCSV_webpack(filename){
-    let target = '!!csv-loader!'+(filename)
-    //console.log(target);
+    //TODO: FIX
+    let target = '!!csv-loader?header=true&dynamicTyping=true!'+(filename)
+    console.log(target);
     return require(target);
   }
 
   //Initialize remaining properties
   initProps(callback){
 
-    //console.log("HI!");
+    console.log("HI!");
+    console.log(this.SectionsCSV);
 
     //init Sections
     this.Sections=Object.fromEntries(
@@ -203,6 +208,8 @@ export default class RECHandler {
     for (var i = 0; i < catmatches.length; i++) {
       this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
     }
+
+    console.log(this.Sections);
 
     this.loaded = true;
     callback.bind(this)();
