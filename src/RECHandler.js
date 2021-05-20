@@ -16,8 +16,10 @@ export default class RECHandler {
   */
 
   constructor() {
+    //TODO: ADD SUPPORT FOR LOCALE CUSTOMIZATOIN
+
     //options
-    this.locale = "UK";
+    this.locale = "EN";
 
     //storage
     this.SectionsCSV = {};
@@ -28,90 +30,35 @@ export default class RECHandler {
 
     this.CategoryMembers = {};
 
+    //Used to cache load configuration
+    //Consider overriding if weird behavior is encountered
     this.loaded = false;
   }
 
   /**
-  *Load!
+  *Load asynchronously !
   */
   async ready(callback){
 
     //TODO: ADD SUPPORT FOR LOCALE CUSTOMIZATOIN
     //TODO: FIX CACHING FOR loadCSV's!
 
-    this.locale="EN";
-
     //Cache if this.loaded!
     if(this.loaded==false){
 
-      this.loadCSV('./localization/EN/code-tables/sections.csv').then(sections => {
-        this.SectionsCSV = sections;
+    try {
+      //TODO: ADD OPTIONAL CALLBACKS?
+      //TODO: FIX PATHS so they can be better tested?
 
-      this.loadCSV('./localization/EN/code-tables/categories.csv').then(categories => {
-        this.CategoriesCSV = categories;
-      
-      this.loadCSV('./localization/EN/code-tables/code-table.csv').then(codes => {
-        this.CodesCSV = codes;
+      this.SectionsCSV = await this.loadCSV_fs('../localization/EN/code-tables/sections.csv');
+      this.CategoriesCSV = await this.loadCSV_fs('../localization/EN/code-tables/categories.csv');
+      this.CodesCSV = await this.loadCSV_fs('../localization/EN/code-tables/code-table.csv');
 
-      //console.log("HI!");
+      this.initProps(callback);
+    } catch (e) {
+    console.error(e);
+    }}
 
-      //init Sections
-      this.Sections=Object.fromEntries(
-        Object.entries(this.SectionsCSV)
-        .map(([ key, val ]) => [ val.Head,
-          new RECSection(
-            Number(val.Head),val.Translation
-            )
-          ]));
-
-      //init Categories
-      this.Categories=Object.fromEntries(
-        Object.entries(this.CategoriesCSV)
-        .map(([ key, val ]) => [ val.Head,
-          new RECCategory(
-            Number(val.Head),val.Translation
-            )
-          ]));
-
-      //init Codes
-      this.Codes=Object.fromEntries(
-        Object.entries(this.CodesCSV)
-        .map(([ key, val ]) => [ val.ID, 
-          new RECCode(
-            Number(val.ID),this.getCategory(val.ID),val.Translation
-            )
-          ]));
-
-      //init Category Members
-      //used to speed up queries
-      this.CategoryMembers=Object.fromEntries(
-        Object.entries(this.CategoriesCSV)
-        .map(([ key, val ]) => [ val.Head, [] ]));
-
-      var codearray = Array.from(Object.values(this.Codes), (i) => i);
-      var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i).no);
-      for (var i = 0; i < catmatches.length; i++) {
-        this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
-      }
-
-      this.loaded = true;
-      callback.bind(this)();
-
-      }, reason => {
-        //Codes Problem
-        console.log(reason);
-      });
-
-      }, reason => {
-        //Categories Problem
-        console.log(reason);
-      });
-
-      }, reason => {
-        //Sections Problem
-        console.log(reason);
-      });
-    }
     else{
       callback.bind(this)();
     }
@@ -119,9 +66,48 @@ export default class RECHandler {
   }
 
   /**
-  *Read from csv
+  *Load sync!
   */
-  async loadCSV(filename){
+  init(){
+
+    //NOTE: this.loaded is ignored so that init()
+    //can be called for reinitializations
+
+    //TODO: ADD SUPPORT FOR LOCALE CUSTOMIZATOIN
+    //TODO: Add alternatives besides csv-loader for webpack
+
+
+    //Cache if this.loaded!
+    //if(this.loaded==false){
+
+    try {
+      //TODO: FIX PATHS so they can be better tested?
+
+    this.SectionsCSV = this.loadCSV_webpack('../localization/EN/code-tables/sections.csv');
+    this.CategoriesCSV = this.loadCSV_webpack('../localization/EN/code-tables/categories.csv');
+    this.CodesCSV = this.loadCSV_webpack('../localization/EN/code-tables/code-table.csv');
+
+      this.initProps(() => void 0);
+    } catch (e) {
+    console.error(e);
+    }
+
+    //}
+
+    /*else{
+      callback.bind(this)();
+      console.log("Already Loaded");
+    }*/
+
+  }
+
+  /**
+  *Read from csv using fs
+  */
+  async loadCSV_fs(filename){
+
+    //TODO FIX THIS?
+
     const CSVconfig = {header: true};
     let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
     .then(csv => Papa.parse(csv,CSVconfig));
@@ -129,6 +115,94 @@ export default class RECHandler {
     else{
       return CSV;
     }
+
+    /*const CSVconfig = {header: true,
+      complete: ...,
+      error: ...
+    };*/
+
+    //const CSVconfig = {header: true};
+
+    /*try {
+      fs.readFile(filename, 'utf-8', function(err,data){
+        console.log(data);
+      });
+      let csv = await Papa.parse(data,CSVconfig);
+      return csv;
+    } catch(e) {
+      console.error(e);
+    }*/
+
+    /*let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
+    .then(csv => Papa.parse(csv,CSVconfig);
+      return CSV;*/
+
+    /*let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
+    .then(csv => Papa.parse(csv,CSVconfig));
+    if (error) console.log("error", error);
+    else{
+      return CSV;
+    }*/
+
+    //let data = fs.readFileSync(filename, 'utf-8');
+  }
+
+  /**
+  *Read from csv using the `csv-loader` webpack loader
+  */
+  loadCSV_webpack(filename){
+    let target = '!!csv-loader!'+(filename)
+    //console.log(target);
+    return require(target);
+  }
+
+  //Initialize remaining properties
+  initProps(callback){
+
+    //console.log("HI!");
+
+    //init Sections
+    this.Sections=Object.fromEntries(
+      Object.entries(this.SectionsCSV)
+      .map(([ key, val ]) => [ val.Head,
+        new RECSection(
+          Number(val.Head),val.Translation
+          )
+        ]));
+
+    //init Categories
+    this.Categories=Object.fromEntries(
+      Object.entries(this.CategoriesCSV)
+      .map(([ key, val ]) => [ val.Head,
+        new RECCategory(
+          Number(val.Head),val.Translation
+          )
+        ]));
+
+    //init Codes
+    this.Codes=Object.fromEntries(
+      Object.entries(this.CodesCSV)
+      .map(([ key, val ]) => [ val.ID, 
+        new RECCode(
+          Number(val.ID),this.getCategory(val.ID),val.Translation
+          )
+        ]));
+
+    //init Category Members
+    //used to speed up queries
+    this.CategoryMembers=Object.fromEntries(
+      Object.entries(this.CategoriesCSV)
+      .map(([ key, val ]) => [ val.Head, [] ]));
+
+    var codearray = Array.from(Object.values(this.Codes), (i) => i);
+    var catmatches = Array.from(Object.keys(this.Codes), (i) => this.getCategory(i).no);
+    for (var i = 0; i < catmatches.length; i++) {
+      this.CategoryMembers[String(catmatches[i])].push(codearray[i]);
+    }
+
+    this.loaded = true;
+    callback.bind(this)();
+
   }
 
   /**
