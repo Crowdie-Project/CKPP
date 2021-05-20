@@ -108,7 +108,11 @@ export default class RECHandler {
 
     //TODO FIX THIS?
 
-    const CSVconfig = {header: true};
+    const CSVconfig = {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    };
     let { data: CSV, error } = await fs.readFile(filename, 'utf-8')
     .then(csv => Papa.parse(csv,CSVconfig));
     if (error) console.log("error", error);
